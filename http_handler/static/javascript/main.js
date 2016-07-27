@@ -454,6 +454,25 @@ $(document).ready(function(){
 			);	
 			
 		};		
+
+	delete_tag = 
+		function(params){
+			$.post('delete_tag', {'group_name': params.group,
+								  'tag_name': params.tag_name}, 
+				function(res){
+					if(res.status){
+						var tag_button = $('#tag_' + params.index + '_button');
+						tag_button.text('Delete this tag');
+						
+						var d_tag = bind(delete_tag, params);
+						tag_button.bind("click");
+						tag_button.click(d_tag);
+                    }
+					notify(res, true);
+				}
+			);	
+			
+		};
 		
 	insert_post = 
 		function(params){
@@ -1116,9 +1135,23 @@ $(document).ready(function(){
 				var um_tag = bind(unmute_tag, params);
 				$(this).bind("click");
 				$(this).click(um_tag);
-			} 
+			} 	
+		});
 
+		$('.tag_delete').each(function(index) {
+
+			tag_type = $( this ).text();
+			tag_name = $("#tag_" + index).text();
 			
+			params = {'tag_name': tag_name, 
+					  'group': active_group,
+					  'index': index};
+			
+			if (tag_type == "Delete this tag") {
+				var d_tag = bind(delete_tag, params);
+				$(this).bind("click");
+				$(this).click(d_tag);
+			} 	
 		});
 	}
 	

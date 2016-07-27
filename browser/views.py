@@ -16,7 +16,7 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 
 from annoying.decorators import render_to
 from schema.models import UserProfile, Group, MemberGroup, Tag, FollowTag,\
-	MuteTag
+	MuteTag, DeleteTag
 from html2text import html2text
 from django.contrib.auth.forms import AuthenticationForm
 from registration.forms import RegistrationForm
@@ -1009,8 +1009,6 @@ def unmute_tag(request):
 		return HttpResponse(request_error, content_type="application/json")
 
 
-
-
 @login_required
 def mute_thread(request):
 	try:
@@ -1045,4 +1043,33 @@ def murmur_acct(request, acct_func=None):
 	groups = Group.objects.filter(membergroup__member=user).values("name")
 	active_group = load_groups(request, groups, user)
 	return acct_func(request, extra_context={'active_group': active_group, 'groups': groups, 'user': request.user})
+
+@render_to("follow_tag.html")
+@login_required
+def delete_tag_get(request):
+	if request.user.is_authenticated():
+		user = get_object_or_404(UserProfile, email=request.user.email)
+		groups = Group.objects.filter(membergroup__member=user).values("name")
+		
+		tag_name = request.GET.get('tag')
+		group_name = request.GET.get('group')
+		res = engine.main.delete_tag(tag_name, group_name, user=user)
+		
+		active_group = load_groups(request, groups, user, group_name=group_name)
+		
+		return {'res': res, 'type': 'del', 'user': request.user, 'groups': groups, 'active_group': active_group}
+	else:
+		return redirect("%s?next=/delete_tag_get?tag=%s&group=%s" % (global_settings.LOGIN_URL, request.GET.get('tag'), request.GET.get('group')))
+
+@login_required
+def delete_tag(request):
+	try:
+		if request.user.is_authenticated():
+			user = get_object_or_404(UserProfile, email=request.user.email)
+			res = engine.main.delete_tag(request.POST['tag_name'], request.POST['group_name'], user=user)
+			return HttpResponse(json.dumps(res), content_type="application/json")
+	except Exception, e:
+		print e
+		logging.debug(e)
+		return HttpResponse(request_error, content_type="application/json")
 

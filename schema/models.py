@@ -86,6 +86,18 @@ class MuteTag(models.Model):
 	class Meta:
 		unique_together = ("user", "tag")
 
+class DeleteTag(models.Model):
+	id = models.AutoField(primary_key=True)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL)
+	group = models.ForeignKey('Group')
+	tag = models.ForeignKey('Tag')
+	timestamp = models.DateTimeField(auto_now=True)
+	
+	def __unicode__(self):
+		return '%s deletes tag %s' % (self.user.email, self.tag.name)
+	
+	class Meta:
+		unique_together = ("user", "tag")
 
 class MemberGroup(models.Model):
 	id = models.AutoField(primary_key=True)

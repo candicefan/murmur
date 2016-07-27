@@ -75,6 +75,10 @@ urlpatterns = patterns('',
      url(r'^unsubscribe_get', 'browser.views.unsubscribe_get'),
      url(r'^subscribe_get', 'browser.views.subscribe_get'),
 
+     url(r'^delete_tag_get', 'browser.views.delete_tag_get'),
+
+     url(r'^delete_tag', 'browser.views.delete_tag'),
+
      
     #override the registration default urls - bug with django 1.6
       url(r'^password/change/$',

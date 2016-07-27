@@ -912,6 +912,20 @@ def upvote(post_id, email=None, user=None):
 	try:
 		if email:
 			user = UserProfile.objects.get(email=email)
+			
+		#Email the owner of the post when upvoted
+		email_addr = email.strip()
+		mail = MailResponse(From = 'no-reply@' + BASE_URL, 
+							To = email_addr, 
+							Subject  = "Your post has been upvoted")
+
+		#email_user = UserProfile.objects.filter(email=email_addr)
+		message = "Your post %s has been upvoted by %s" % (post_id, user)
+		
+		mail.Html = message
+		logging.debug('TO LIST: ' + str(email_addr))
+		relay_mailer.deliver(mail, To = [email_addr])
+
 		p = Post.objects.get(id=int(post_id))
 		l = Upvote.objects.get(post=p, user=user)
 		res['status'] = True
@@ -1178,3 +1192,28 @@ def unmute_tag(tag_name, group_name, user=None, email=None):
 		res['code'] = msg_code['UNKNOWN_ERROR']
 	logging.debug(res)
 	return res
+
+def delete_tag(tag_name, group_name, user=None, email=None):
+	res = {'status':False}
+	g = Group.objects.get(name=group_name)
+	tag = None
+	try:
+		if email:
+			user = UserProfile.objects.get(email=email)
+		tag = Tag.objects.get(name=tag_name, group=g)
+		tag_delete = DeleteTag.objects.get(tag=tag, user=user)
+		res['tag_name'] = tag_name
+		res['status'] = True
+	except DeleteTag.DoesNotExist:
+		f = DeleteTag(tag=tag, group=g, user=user)
+		f.save()
+		res['tag_name'] = tag_name
+		res['status'] = True
+	except Tag.DoesNotExist:
+		res['code'] = msg_code['TAG_NOT_FOUND_ERROR']
+	except:
+		res['code'] = msg_code['UNKNOWN_ERROR']
+	logging.debug(res)
+	return res
+
+

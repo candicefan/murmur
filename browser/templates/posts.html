@@ -72,6 +72,7 @@
 						{% else %}
 							<label class="label3 tag_follow_mute" id="tag_{{ forloop.counter0 }}_button">Follow this tag</label>
 						{% endif %}
+
 					{% else %}
 						{% if tag.muted %}
 							<label class="label3 tag_follow_mute" id="tag_{{ forloop.counter0 }}_button">Unmute this tag</label>
@@ -79,7 +80,13 @@
 							<label class="label3 tag_follow_mute" id="tag_{{ forloop.counter0 }}_button">Mute this tag</label>
 						{% endif %}
 					{% endif %}
+
+					{% if member_info.admin %}
+						<label class="label3 tag_delete" id="tag_{{ forloop.counter0 }}_button">Delete this tag</label>
+					{% endif %}
+
 				</td>
+
 			</tr>
 		{% endfor %}
 		</table>
