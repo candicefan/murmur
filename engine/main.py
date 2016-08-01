@@ -917,7 +917,7 @@ def upvote(post_id, email=None, user=None):
 		email_addr = email.strip()
 		mail = MailResponse(From = 'no-reply@' + BASE_URL, 
 							To = email_addr, 
-							Subject  = "Your post has been upvoted")
+							Subject  = "Your Post Has Been Upvoted")
 
 		#email_user = UserProfile.objects.filter(email=email_addr)
 		message = "Your post %s has been upvoted by %s" % (post_id, user)
